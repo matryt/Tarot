@@ -8,6 +8,7 @@ public class Game {
     private Player joueurEnchere;
     private String enchereFaite;
     private Deck chien;
+    private int playerStarting;
 
     public Game(Scanner s) {
         myCartes = new Deck(78);
@@ -146,6 +147,7 @@ public class Game {
         boolean finished = false;
         while (!finished) {
             afficherCartes(s);
+            wholeTurn(s);
             finished = true;
         }
     }
@@ -214,7 +216,7 @@ public class Game {
         }
     }
 
-    public void turn(int player, Scanner s) {
+    public Carte turn(int player, Scanner s) {
         Deck myDeck = players[player].myCards;
         System.out.println("C'est au tour de " + players[player].getName() + " de joueur \nEntrer n'importe quel caractère pour continuer.");
         s.next();
@@ -225,16 +227,33 @@ public class Game {
             System.out.println("Quelle carte voulez-vous jouer ?");
             carte = s.nextInt();
         }
+        Carte card = myDeck.cards[carte];
         myDeck.cards[carte] = null;
+        return card;
     }
 
-    public void wholeTurn(int playerStarting, Scanner s) {
+    public void wholeTurn(Scanner s) {
+        Carte[] cartesJouees = new Carte[nPlayers];
         for (int i=playerStarting; i < players.length; i++) {
-            turn(i, s);
+            cartesJouees[i] = turn(i, s);
         }
         for (int i=0; i < playerStarting; i++) {
-            turn(i, s);
+            cartesJouees[i] = turn(i, s);
         }
+        playerStarting = carteGagnante(cartesJouees);
+        System.out.println("C'est " + players[playerStarting].getName() + " qui a gagné !");
+    }
+
+    public int carteGagnante(Carte[] tour) {
+        Carte carte = tour[0];
+        int indice=0;
+        for (int i=1; i < tour.length; i++) {
+            if (carte.compareTo(tour[i]) < 0 && tour[i] != null) {
+                carte = tour[i];
+                indice = i;
+            }
+        }
+        return indice;
     }
 
 
