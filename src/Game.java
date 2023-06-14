@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -144,11 +145,8 @@ public class Game {
         afficherCartes(s);
         encheres(s);
         montrerChien(s);
-        boolean finished = false;
-        while (!finished) {
-            afficherCartes(s);
+        while (players[0].myCards.getByIndex(0) != null) {
             wholeTurn(s);
-            finished = true;
         }
     }
 
@@ -216,14 +214,27 @@ public class Game {
         }
     }
 
-    public Carte turn(int player, Scanner s) {
+    public Carte turn(int player, Scanner s, String typeRequired, String colorRequired) {
         Deck myDeck = players[player].myCards;
+        if (!Objects.equals(colorRequired, "") && !(myDeck.hasColor(colorRequired))) {
+            typeRequired = "Atout";
+        }
         System.out.println("C'est au tour de " + players[player].getName() + " de joueur \nEntrer n'importe quel caractère pour continuer.");
         s.next();
         System.out.println(myDeck);
         System.out.println("Quelle carte voulez-vous jouer ?");
         int carte = s.nextInt();
         while (carte < 0 || carte >= myDeck.cards.length || myDeck.cards[carte] == null) {
+            System.out.println("Quelle carte voulez-vous jouer ?");
+            carte = s.nextInt();
+        }
+        while ((!(typeRequired.equals("")) && !(myDeck.cards[carte].type.equals(typeRequired)) && (myDeck.hasType(typeRequired))) || myDeck.cards[carte] == null) {
+            System.out.println("Vous devez mettre une carte de type " + typeRequired);
+            System.out.println("Quelle carte voulez-vous jouer ?");
+            carte = s.nextInt();
+        }
+        while ((!(colorRequired.equals("")) && !(myDeck.cards[carte].couleur.toString().equals(colorRequired)) && (myDeck.hasColor(colorRequired))) || myDeck.cards[carte] == null) {
+            System.out.println("Vous devez mettre une carte de la couleur "+colorRequired);
             System.out.println("Quelle carte voulez-vous jouer ?");
             carte = s.nextInt();
         }
@@ -234,11 +245,23 @@ public class Game {
 
     public void wholeTurn(Scanner s) {
         Carte[] cartesJouees = new Carte[nPlayers];
-        for (int i=playerStarting; i < players.length; i++) {
-            cartesJouees[i] = turn(i, s);
+        cartesJouees[playerStarting] = turn(playerStarting, s,"","");
+        System.out.println(players[playerStarting].getName() + " a joué la carte " + cartesJouees[playerStarting]);
+        String type="";
+        String color="";
+        if (Objects.equals(cartesJouees[playerStarting].type, "Atout")) {
+            type = "Atout";
+        }
+        else {
+            color = String.valueOf(cartesJouees[playerStarting].couleur);
+        }
+        for (int i=playerStarting + 1; i < players.length; i++) {
+            cartesJouees[i] = turn(i, s, type, color);
+            System.out.println(players[i].getName() + " a joué la carte " + cartesJouees[i]);
         }
         for (int i=0; i < playerStarting; i++) {
-            cartesJouees[i] = turn(i, s);
+            cartesJouees[i] = turn(i, s, type, color);
+            System.out.println(players[i].getName() + " a joué la carte " + cartesJouees[i]);
         }
         playerStarting = carteGagnante(cartesJouees);
         System.out.println("C'est " + players[playerStarting].getName() + " qui a gagné !");

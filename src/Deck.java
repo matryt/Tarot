@@ -35,7 +35,14 @@ public class Deck implements Cloneable{
     public String toString() {
         StringBuilder ch= new StringBuilder();
         for (int i=0;i<cards.length;i++) {
-            ch.append("\t").append(i).append(") ").append(cards[i].toString()).append("\n");
+            ch.append("\t").append(i).append(") ");
+            if (cards[i] != null) {
+                ch.append(cards[i].toString());
+            }
+            else {
+                ch.append("Aucune");
+            }
+            ch.append("\n");
         }
         return ch.toString();
     }
@@ -44,7 +51,7 @@ public class Deck implements Cloneable{
     public Boolean hasColor(String color) throws IllegalArgumentException {
         for (Carte c: cards) {
             try {
-                if (c.couleur == Couleurs.valueOf(color.toUpperCase())) {
+                if (c != null && c.couleur == Couleurs.valueOf(color.toUpperCase())) {
                     return true;
                 }
             }

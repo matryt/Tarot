@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -60,14 +62,14 @@ public class Carte implements Comparable<Carte> {
     }
 
     @Override
-    public int compareTo(Carte other) {
+    public int compareTo(@NotNull Carte other) {
         if (this.equals(other)) {
             return 0;
         }
 
         // Comparaison par type
         if (!this.type.equals(other.type)) {
-            return index(typesAvailable, this.type) - index(typesAvailable, other.type);
+            return - index(typesAvailable, this.type) + index(typesAvailable, other.type);
         }
 
         // Comparaison par couleur
@@ -76,7 +78,7 @@ public class Carte implements Comparable<Carte> {
         }
 
         // Comparaison par valeur
-        return index(valeursAvailable, this.valeur) - index(valeursAvailable, other.valeur);
+        return - index(valeursAvailable, this.valeur) + index(valeursAvailable, other.valeur);
     }
 
     @Override
