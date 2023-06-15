@@ -29,38 +29,6 @@ public class Carte implements Comparable<Carte> {
         }
     }
 
-    public String description() throws UnsupportedOperationException{
-        switch (this.type) {
-            case "Atout" -> {
-                if (valeur.equals("Excuse")) {
-                    return "ID " + this.ID + " - " + unfill(this.valeur);
-                }
-                if (valeur.equals("01")) {
-                    return "ID " + this.ID + " - Petit";
-                }
-                return "ID " + this.ID + " - " + unfill(this.valeur) + " d'" + this.type;
-            }
-            case "Nombre" -> {
-                return "ID " + this.ID + " - " + unfill(this.valeur) + " de " + this.couleur;
-            }
-            default -> throw new UnsupportedOperationException("Ce type est inconnu");
-        }
-
-    }
-
-    public Boolean greater(Carte other) throws IllegalArgumentException {
-        if (!Objects.equals(this.type, other.type) && (this.type.equals("Atout") || other.type.equals("Atout"))) {
-            return (index(typesAvailable, this.type) < index(typesAvailable, other.type));
-        }
-        if (this.couleur == other.couleur) {
-            if (!Objects.equals(this.type, other.type)) {
-                return (index(typesAvailable, this.type) < index(typesAvailable, other.type));
-            }
-            return (index(valeursAvailable, this.valeur) > index(valeursAvailable, other.valeur));
-        }
-        throw new IllegalArgumentException("Les cartes doivent être de la même couleur pour être comparées.");
-    }
-
     @Override
     public int compareTo(@NotNull Carte other) {
         if (this.equals(other)) {
@@ -78,7 +46,7 @@ public class Carte implements Comparable<Carte> {
         }
 
         // Comparaison par valeur
-        return - index(valeursAvailable, this.valeur) + index(valeursAvailable, other.valeur);
+        return index(valeursAvailable, this.valeur) - index(valeursAvailable, other.valeur);
     }
 
     @Override

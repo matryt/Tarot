@@ -145,7 +145,7 @@ public class Game {
         afficherCartes(s);
         encheres(s);
         montrerChien(s);
-        while (players[0].myCards.getByIndex(0) != null) {
+        while (!players[0].myCards.isEmpty()) {
             wholeTurn(s);
         }
     }
@@ -196,7 +196,7 @@ public class Game {
             System.out.println(joueurEnchere.getName()+", entrez n'importe quel caractère pour voir votre chien !");
             s.next();
             int choix = 0;
-            while (choix != -1) {
+            while (choix != -1 ) {
                 System.out.println(chien);
                 System.out.println("Votre jeu : \n" + joueurEnchere.myCards);
                 System.out.println("Quelle carte voulez enlever de votre chien ? (ou -1 pour arrêter) ");
@@ -210,16 +210,23 @@ public class Game {
                     joueurEnchere.myCards.sort();
                 }
 
+                if (choix == -1 && !chien.chienCorrect()) {
+                    choix = -2;
+                    System.out.println("Il y a encore des cartes interdites dans le chien !");
+                }
+
+
             }
+
         }
     }
 
-    public Carte turn(int player, Scanner s, String typeRequired, String colorRequired) {
+    public Carte turn(int player, Scanner s, String typeRequired, String colorRequired, int atoutMinimal) {
         Deck myDeck = players[player].myCards;
         if (!Objects.equals(colorRequired, "") && !(myDeck.hasColor(colorRequired))) {
             typeRequired = "Atout";
         }
-        System.out.println("C'est au tour de " + players[player].getName() + " de joueur \nEntrer n'importe quel caractère pour continuer.");
+        System.out.println("\n C'est au tour de " + players[player].getName() + " de jouer \nEntrer n'importe quel caractère pour continuer.");
         s.next();
         System.out.println(myDeck);
         System.out.println("Quelle carte voulez-vous jouer ?");
@@ -228,12 +235,26 @@ public class Game {
             System.out.println("Quelle carte voulez-vous jouer ?");
             carte = s.nextInt();
         }
-        while ((!(typeRequired.equals("")) && !(myDeck.cards[carte].type.equals(typeRequired)) && (myDeck.hasType(typeRequired))) || myDeck.cards[carte] == null) {
-            System.out.println("Vous devez mettre une carte de type " + typeRequired);
+
+        while ((!(typeRequired.equals(""))
+                        && (!(myDeck.cards[carte].type.equals(typeRequired))
+                                || (Integer.parseInt(myDeck.cards[carte].valeur) < atoutMinimal
+                                    && myDeck.maxAtout() >= atoutMinimal)
+                            )
+                        && (myDeck.hasType(typeRequired))
+                        && !(myDeck.cards[carte].valeur.equals("Excuse"))
+        )
+                || myDeck.cards[carte] == null) {
+            System.out.println("Vous devez mettre une carte de type " + typeRequired + " et de valeur min " + atoutMinimal);
             System.out.println("Quelle carte voulez-vous jouer ?");
             carte = s.nextInt();
         }
-        while ((!(colorRequired.equals("")) && !(myDeck.cards[carte].couleur.toString().equals(colorRequired)) && (myDeck.hasColor(colorRequired))) || myDeck.cards[carte] == null) {
+
+        while ((!(colorRequired.equals(""))
+                    && !(myDeck.cards[carte].couleur.toString().equals(colorRequired))
+                    && (myDeck.hasColor(colorRequired)))
+                    && !(myDeck.cards[carte].valeur.equals("Excuse"))
+                || myDeck.cards[carte] == null) {
             System.out.println("Vous devez mettre une carte de la couleur "+colorRequired);
             System.out.println("Quelle carte voulez-vous jouer ?");
             carte = s.nextInt();
@@ -243,9 +264,15 @@ public class Game {
         return card;
     }
 
+
     public void wholeTurn(Scanner s) {
         Carte[] cartesJouees = new Carte[nPlayers];
-        cartesJouees[playerStarting] = turn(playerStarting, s,"","");
+        int atoutMin = 0;
+        cartesJouees[playerStarting] = turn(playerStarting, s,"","", atoutMin);
+        Carte card = cartesJouees[playerStarting];
+        if (card.type.equals("Atout") && Integer.parseInt(card.valeur) > atoutMin) {
+            atoutMin = Integer.parseInt(card.valeur);
+        }
         System.out.println(players[playerStarting].getName() + " a joué la carte " + cartesJouees[playerStarting]);
         String type="";
         String color="";
@@ -256,11 +283,19 @@ public class Game {
             color = String.valueOf(cartesJouees[playerStarting].couleur);
         }
         for (int i=playerStarting + 1; i < players.length; i++) {
-            cartesJouees[i] = turn(i, s, type, color);
+            cartesJouees[i] = turn(i, s, type, color, atoutMin);
+            card = cartesJouees[i];
+            if (card.type.equals("Atout") && Integer.parseInt(card.valeur) > atoutMin) {
+                atoutMin = Integer.parseInt(card.valeur);
+            }
             System.out.println(players[i].getName() + " a joué la carte " + cartesJouees[i]);
         }
         for (int i=0; i < playerStarting; i++) {
-            cartesJouees[i] = turn(i, s, type, color);
+            cartesJouees[i] = turn(i, s, type, color, atoutMin);
+            card = cartesJouees[i];
+            if (card.type.equals("Atout") && Integer.parseInt(card.valeur) > atoutMin) {
+                atoutMin = Integer.parseInt(card.valeur);
+            }
             System.out.println(players[i].getName() + " a joué la carte " + cartesJouees[i]);
         }
         playerStarting = carteGagnante(cartesJouees);

@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Random;
 
 public class Deck implements Cloneable{
@@ -64,11 +65,21 @@ public class Deck implements Cloneable{
 
     public Boolean hasType(String type) {
         for (Carte c: cards) {
-            if (c.type.equals(type)) {
+            if (c != null && c.type.equals(type)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public int maxAtout() {
+        int max = 0;
+        for (Carte c: cards) {
+            if (c != null && Objects.equals(c.type, "Atout") && !(c.valeur.equals("Excuse")) && Integer.parseInt(c.valeur) > max) {
+                max = Integer.parseInt(c.valeur);
+            }
+        }
+        return max;
     }
 
     public Boolean isEmpty() {
@@ -80,13 +91,13 @@ public class Deck implements Cloneable{
         return true;
     }
 
-    public Carte getCardByID(String ID) throws NoSuchElementException {
+    public boolean chienCorrect() {
         for (Carte c: cards) {
-            if (c.getID().equals(ID)) {
-                return c;
+            if (c.type.equals("Atout") || c.valeur.contains("Roi")) {
+                return false;
             }
         }
-        throw new NoSuchElementException("Aucune carte trouvée avec l'ID spécifié.");
+        return true;
     }
 
     public Carte randCard() {
