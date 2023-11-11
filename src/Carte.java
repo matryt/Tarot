@@ -1,39 +1,42 @@
 import org.jetbrains.annotations.NotNull;
 
+
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public class Carte implements Comparable<Carte> {
     String type;
-    String valeur;
+    Valeurs valeur;
     Couleurs couleur;
     String ID;
     String [] typesAvailable = new String[] {"Atout", "Nombre"};
-    String [] valeursAvailable = {"Excuse", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10","Valet", "Cavalier", "Dame", "Roi", "11", "12",
-    "13", "14", "15", "16", "17", "18", "19", "20", "21"};
 
 
-    public Carte(String type, String valeur, String couleur) {
+    public Carte(String type, Valeurs valeur, String couleur) {
         this.type = type;
         this.valeur = valeur;
         switch (couleur) {
-            case "coeur" -> this.couleur = Couleurs.COEUR;
-            case "carreau" -> this.couleur = Couleurs.CARREAU;
-            case "pique" -> this.couleur = Couleurs.PIQUE;
-            case "trefle" -> this.couleur = Couleurs.TREFLE;
+            case "Coeur" -> this.couleur = Couleurs.COEUR;
+            case "Carreau" -> this.couleur = Couleurs.CARREAU;
+            case "Pique" -> this.couleur = Couleurs.PIQUE;
+            case "Trèfle" -> this.couleur = Couleurs.TREFLE;
             default -> this.couleur = Couleurs.AUCUNE;
         }
-        ID = type.charAt(0) + valeur.substring(0, 2);
-        if (!(couleur.equals(""))) {
+        ID = type.charAt(0) + valeur.toString();
+        if (!(couleur.isEmpty())) {
             ID = ID + couleur.substring(0, 2);
         }
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj.getClass() != this.getClass()) return false;
+        Carte other = (Carte) obj;
+        return this.compareTo(other) > 0;
+    }
+
+    @Override
     public int compareTo(@NotNull Carte other) {
-        if (this.equals(other)) {
-            return 0;
-        }
 
         // Comparaison par type
         if (!this.type.equals(other.type)) {
@@ -46,23 +49,24 @@ public class Carte implements Comparable<Carte> {
         }
 
         // Comparaison par valeur
-        return index(valeursAvailable, this.valeur) - index(valeursAvailable, other.valeur);
+        return this.valeur.getValue() - other.valeur.getValue();
     }
 
     @Override
     public String toString() throws UnsupportedOperationException{
+        String val = this.valeur.toString();
         switch (this.type) {
             case "Atout" -> {
-                if (valeur.equals("Excuse")) {
-                    return unfill(this.valeur);
+                if (val.equals("Excuse")) {
+                    return val;
                 }
-                if (valeur.equals("01")) {
+                if (val.equals("01")) {
                     return "Petit";
                 }
-                return unfill(this.valeur) + " d'" + this.type;
+                return unfill(val) + " d'" + this.type;
             }
             case "Nombre" -> {
-                return unfill(this.valeur) + " de " + this.couleur;
+                return unfill(val) + " de " + this.couleur;
             }
             default -> throw new UnsupportedOperationException("Ce type est inconnu");
         }

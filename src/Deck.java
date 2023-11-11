@@ -1,16 +1,16 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Random;
 
 public class Deck implements Cloneable{
     int length;
     Carte[] cards;
+    public final Random myRand = new Random();
     public Deck(int number) {
         cards = new Carte[number];
         length = number;
-
-
     }
 
     public int firstNullIndex() throws NoSuchElementException {
@@ -49,7 +49,7 @@ public class Deck implements Cloneable{
     }
 
 
-    public Boolean hasColor(String color) throws IllegalArgumentException {
+    public boolean hasColor(String color) throws IllegalArgumentException {
         for (Carte c: cards) {
             try {
                 if (c != null && c.couleur == Couleurs.valueOf(color.toUpperCase())) {
@@ -75,8 +75,8 @@ public class Deck implements Cloneable{
     public int maxAtout() {
         int max = 0;
         for (Carte c: cards) {
-            if (c != null && Objects.equals(c.type, "Atout") && !(c.valeur.equals("Excuse")) && Integer.parseInt(c.valeur) > max) {
-                max = Integer.parseInt(c.valeur);
+            if (c != null && c.type.equals("Atout") && !(c.valeur.getName().equals("Excuse")) && c.valeur.getValue() > max) {
+                max = c.valeur.getValue();
             }
         }
         return max;
@@ -93,14 +93,14 @@ public class Deck implements Cloneable{
 
     public boolean chienCorrect() {
         for (Carte c: cards) {
-            if (c.type.equals("Atout") || c.valeur.contains("Roi")) {
+            if (c.type.equals("Atout") || c.valeur.getName().contains("Roi")) {
                 return false;
             }
         }
         return true;
     }
 
-    public Carte randCard() {
+    public Carte randCard() throws NoSuchElementException {
         if (isEmpty()) {
             throw new NoSuchElementException("Le tableau est vide.");
         }
@@ -113,9 +113,8 @@ public class Deck implements Cloneable{
     }
 
     public void shuffle() {
-        Random rd = new Random();
         for (int i = cards.length - 1; i>0; i--) {
-            int j = rd.nextInt(i+1);
+            int j = myRand.nextInt(i+1);
             Carte temp = cards[i];
             cards[i] = cards[j];
             cards[j] = temp;
@@ -133,7 +132,7 @@ public class Deck implements Cloneable{
                 return carte1.couleur.compareTo(carte2.couleur);
             }
 
-            return index(carte1.valeursAvailable, carte1.valeur) > index(carte2.valeursAvailable, carte2.valeur) ? 1 : -1;
+            return carte1.valeur.getValue() > carte2.valeur.getValue() ? 1 : -1;
 
         });
     }
@@ -142,7 +141,7 @@ public class Deck implements Cloneable{
         return cards[index];
     }
 
-    public int index(String [] table, String element) throws NoSuchElementException {
+    public int index(String @NotNull [] table, String element) throws NoSuchElementException {
         for (int i=0; i<table.length; i++) {
             if (table[i].equals(element)) {
                 return i;
