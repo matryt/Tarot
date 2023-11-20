@@ -9,6 +9,7 @@ public class Carte implements Comparable<Carte> {
     Couleurs couleur;
     String ID;
     String [] typesAvailable = new String[] {"Atout", "Nombre"};
+    boolean compte = false;
 
 
     public Carte(String type, Valeurs valeur, String couleur) {
@@ -91,7 +92,11 @@ public class Carte implements Comparable<Carte> {
         return sb.toString();
     }
 
-    public String getID() {
-        return ID;
+    public void compter() {
+        this.compte = true;
+    }
+
+    public boolean estComptee() {
+        return this.compte;
     }
 }

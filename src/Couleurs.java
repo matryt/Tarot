@@ -1,4 +1,4 @@
 public enum Couleurs {
-    TREFLE, CARREAU, COEUR, PIQUE, AUCUNE;
+    TREFLE, CARREAU, COEUR, PIQUE, AUCUNE
 
 }

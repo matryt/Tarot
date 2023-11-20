@@ -3,19 +3,18 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
-    private int nPlayers;
-    private Deck myCartes;
-    private Player[] players;
+    private final int nPlayers;
+    private final Player[] players;
     private Player joueurEnchere;
     private String enchereFaite;
-    private Deck chien;
+    private final Deck chien;
     private int playerStarting;
     private Deck[] cartesGagnees;
     private static final Scanner s = new Scanner(System.in);
     private Carte[] cartesJouees;
 
     public Game() {
-        myCartes = new Deck(78);
+        Deck myCartes = new Deck(78);
         myCartes.cards = createCards();
         nPlayers = askNumberPlayers();
         players = new Player[nPlayers];
@@ -82,14 +81,6 @@ public class Game {
         }
         game[0] = null;
         return elem;
-    }
-
-    public String zfill(String str, int width) {
-        StringBuilder sb = new StringBuilder(str);
-        while (sb.length() < width) {
-            sb.insert(0, '0');
-        }
-        return sb.toString();
     }
 
 
@@ -167,6 +158,7 @@ public class Game {
         while (!players[0].myCards.isEmpty()) {
             wholeTurn();
         }
+        calculerPoints();
     }
 
     public void encheres() {
@@ -296,15 +288,14 @@ public class Game {
         int carte = s.nextInt();
         Carte card = myDeck.cards[carte];
         myDeck.cards[carte] = null;
-        cartesJouees[0] = card;
+        cartesJouees[playerStarting] = card;
         return operationsPostTour(players[0], cartesJouees[0], 0);
     }
 
 
     public void wholeTurn() {
         cartesJouees = new Carte[nPlayers];
-        int atoutMin = 0;
-        firstPlayerTurn();
+        int atoutMin = firstPlayerTurn();
         Carte card = cartesJouees[playerStarting];
         if (card.type.equals("Atout") && card.valeur.getValue() > atoutMin) {
             atoutMin = card.valeur.getValue();
@@ -318,7 +309,14 @@ public class Game {
             atoutMin = turnOnePlayer(i, type, color, atoutMin);
         }
         playerStarting = carteGagnante(cartesJouees);
+        addCartesGagnees(playerStarting, cartesJouees);
         System.out.println("C'est " + players[playerStarting].getName() + " qui a gagné !");
+    }
+
+    public void addCartesGagnees(int player, Carte[] cartes) {
+        for (Carte c: cartes) {
+            cartesGagnees[player].append(c);
+        }
     }
 
     public int operationsPostTour(Player player, Carte carte, int atoutMin) {
@@ -340,6 +338,14 @@ public class Game {
             }
         }
         return indice;
+    }
+
+    public void calculerPoints() {
+        double points;
+        for (Deck d: cartesGagnees) {
+            points = d.compterPoints();
+            System.out.println("Le joueur " + players[cartesGagnees.length].getName() + " a gagné " + points + " points !");
+        }
     }
 
 

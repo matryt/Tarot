@@ -1,13 +1,13 @@
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 public class Deck implements Cloneable{
     int length;
     Carte[] cards;
-    public final Random myRand = new Random();
     public Deck(int number) {
         cards = new Carte[number];
         length = number;
@@ -100,27 +100,6 @@ public class Deck implements Cloneable{
         return true;
     }
 
-    public Carte randCard() throws NoSuchElementException {
-        if (isEmpty()) {
-            throw new NoSuchElementException("Le tableau est vide.");
-        }
-        Carte c = cards[0];
-        while (c==null) {
-            shuffle();
-            c = cards[0];
-        }
-        return c;
-    }
-
-    public void shuffle() {
-        for (int i = cards.length - 1; i>0; i--) {
-            int j = myRand.nextInt(i+1);
-            Carte temp = cards[i];
-            cards[i] = cards[j];
-            cards[j] = temp;
-        }
-    }
-
     public void sort() {
         Arrays.sort(cards, (carte1, carte2) -> {
             // Comparaison par type
@@ -153,5 +132,87 @@ public class Deck implements Cloneable{
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();    // renvoie une copie superficielle
+    }
+
+    public Carte getCarteHaute() {
+        int i = 0;
+        Carte myCard = cards[0];
+        while (myCard != null && !((myCard.type.equals("Atout")
+                    && (myCard.valeur.getValue() == 21 || myCard.valeur.getValue() == 1))
+                || (myCard.type.equals("Nombre")
+                && myCard.valeur.getValue() >= 22
+                && myCard.valeur.getValue() <= 25))
+                && !myCard.estComptee()) {
+            i += 1;
+            myCard = cards[i];
+        }
+        if (myCard != null) {
+            myCard.compter();
+        }
+        return myCard;
+    }
+
+    public boolean carteHauteExiste() {
+        int i = 0;
+        Carte myCard = cards[0];
+        while (myCard != null && !((myCard.type.equals("Atout")
+                && (myCard.valeur.getValue() == 21 || myCard.valeur.getValue() == 1))
+                || (myCard.type.equals("Nombre")
+                && myCard.valeur.getValue() >= 22
+                && myCard.valeur.getValue() <= 25))
+                && !myCard.estComptee()) {
+            i += 1;
+            myCard = cards[i];
+        }
+        return myCard != null;
+    }
+
+    public Carte getCarteBasse() {
+        int i = 0;
+        Carte myCard = cards[0];
+        while (myCard != null && (myCard.type.equals("Nombre")
+                && myCard.valeur.getValue() >= 1
+                && myCard.valeur.getValue() <= 21)
+                && !myCard.estComptee()) {
+            i += 1;
+            myCard = cards[i];
+        }
+        if (myCard != null) {
+            myCard.compter();
+        }
+        return myCard;
+    }
+
+    public boolean carteBasseExiste() {
+        int i = 0;
+        Carte myCard = cards[0];
+        while (myCard != null && (myCard.type.equals("Nombre")
+                && myCard.valeur.getValue() >= 1
+                && myCard.valeur.getValue() <= 21)
+                && !myCard.estComptee()) {
+            i += 1;
+            myCard = cards[i];
+        }
+        return myCard != null;
+    }
+
+    public double compterPoints() {
+        HashMap<String, Integer> pointsParCarte = new HashMap<String, Integer>();
+        pointsParCarte.put("Atout", 5);
+        pointsParCarte.put("Roi", 5);
+        pointsParCarte.put("Dame", 4);
+        pointsParCarte.put("Cavalier", 3);
+        pointsParCarte.put("Valet", 2);
+        double points = 0.0;
+        while (carteHauteExiste()) {
+            Carte carteHaute = getCarteHaute();
+            Carte carteBasse = getCarteBasse();
+            points += pointsParCarte.get(carteHaute.type);
+        }
+        while (carteBasseExiste()) {
+            Carte carteBasse = getCarteBasse();
+            points += 0.5;
+        }
+        return points;
     }
 }
