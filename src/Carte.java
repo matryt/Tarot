@@ -96,7 +96,7 @@ public class Carte implements Comparable<Carte> {
         this.compte = true;
     }
 
-    public boolean estComptee() {
-        return this.compte;
+    public boolean pasComptee() {
+        return !this.compte;
     }
 }

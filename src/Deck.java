@@ -1,7 +1,6 @@
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
@@ -142,7 +141,7 @@ public class Deck implements Cloneable{
                 || (myCard.type.equals("Nombre")
                 && myCard.valeur.getValue() >= 22
                 && myCard.valeur.getValue() <= 25))
-                && !myCard.estComptee()) {
+                && myCard.pasComptee()) {
             i += 1;
             myCard = cards[i];
         }
@@ -160,7 +159,7 @@ public class Deck implements Cloneable{
                 || (myCard.type.equals("Nombre")
                 && myCard.valeur.getValue() >= 22
                 && myCard.valeur.getValue() <= 25))
-                && !myCard.estComptee()) {
+                && myCard.pasComptee()) {
             i += 1;
             myCard = cards[i];
         }
@@ -173,7 +172,7 @@ public class Deck implements Cloneable{
         while (myCard != null && (myCard.type.equals("Nombre")
                 && myCard.valeur.getValue() >= 1
                 && myCard.valeur.getValue() <= 21)
-                && !myCard.estComptee()) {
+                && myCard.pasComptee()) {
             i += 1;
             myCard = cards[i];
         }
@@ -189,7 +188,7 @@ public class Deck implements Cloneable{
         while (myCard != null && (myCard.type.equals("Nombre")
                 && myCard.valeur.getValue() >= 1
                 && myCard.valeur.getValue() <= 21)
-                && !myCard.estComptee()) {
+                && myCard.pasComptee()) {
             i += 1;
             myCard = cards[i];
         }
@@ -197,7 +196,7 @@ public class Deck implements Cloneable{
     }
 
     public double compterPoints() {
-        HashMap<String, Integer> pointsParCarte = new HashMap<String, Integer>();
+        HashMap<String, Integer> pointsParCarte = new HashMap<>();
         pointsParCarte.put("Atout", 5);
         pointsParCarte.put("Roi", 5);
         pointsParCarte.put("Dame", 4);
